@@ -3,7 +3,7 @@ import fastapi
 from fastapi import UploadFile, File
 from pydantic import BaseModel
 from typing import List, Optional
-from model import DelayModel  # Import the DelayModel from model.py
+from challenge.model import DelayModel  # Import the DelayModel from model.py
 import pandas as pd
 
 app = fastapi.FastAPI()
@@ -35,7 +35,7 @@ async def train_model(file: UploadFile = File(...)) -> dict:
         # Preprocess the data
         features, target = model.preprocess(dataframe, 'delay')
         # Train the model
-        model.fit(features, target)
+        model.fit(features, target, 'delay')
 
         return {
             "status": "Model trained successfully"
@@ -54,6 +54,7 @@ async def post_predict(flights_data: FlightsData) -> dict:
         # Get predictions
         predictions = model.predict(features)
         # Return the predictions
-        return {"predictions": predictions}
+        return {"predict": predictions}
     except Exception as e:
+        print(e)
         raise fastapi.HTTPException(status_code=400, detail=str(e))

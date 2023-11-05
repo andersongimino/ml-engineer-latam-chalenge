@@ -6,16 +6,27 @@ from typing import Tuple, Union, List, Any
 
 class DelayModel:
 
-    expected_columns = [
-        "Fecha_I", "Vlo_I", "Ori_I", "Des_I", "Emp_I",
-        "Fecha_O", "Vlo_O", "Ori_O", "Des_O", "Emp_O",
-        "DIA", "MES", "AÑO", "DIANOM", "TIPOVUELO",
-        "OPERA", "SIGLAORI", "SIGLADES"
-    ]
-
     def __init__(self):
         self._model = xgb.XGBClassifier()
         self.features = None
+        self.expected_columns = [
+            "Fecha_I", "Vlo_I", "Ori_I", "Des_I", "Emp_I",
+            "Fecha_O", "Vlo_O", "Ori_O", "Des_O", "Emp_O",
+            "DIA", "MES", "AÑO", "DIANOM", "TIPOVUELO",
+            "OPERA", "SIGLAORI", "SIGLADES"
+        ]
+        self.top_10_features = [
+            "OPERA_Latin American Wings",
+            "MES_7",
+            "MES_10",
+            "OPERA_Grupo LATAM",
+            "MES_12",
+            "TIPOVUELO_I",
+            "MES_4",
+            "MES_11",
+            "OPERA_Sky Airline",
+            "OPERA_Copa Air"
+        ]
 
     @staticmethod
     def get_period_day(date_str: str) -> str:
@@ -53,7 +64,7 @@ class DelayModel:
         fecha_i = datetime.strptime(fecha_i_str, '%Y-%m-%d %H:%M:%S')
         return (fecha_o - fecha_i).total_seconds() / 60
 
-    def preprocess(self, data: pd.DataFrame, target_column: str = None) -> Union[Tuple[pd.DataFrame, pd.DataFrame], pd.DataFrame]:
+    def preprocess(self, data: pd.DataFrame, target_column: str = None) -> Union[Tuple[pd.DataFrame, pd.DataFrame],pd.DataFrame]:
         # Adicionar colunas faltantes com zeros
         if len(data.columns) < 18:
             missing_cols = set(self.expected_columns) - set(data.columns)
@@ -77,32 +88,28 @@ class DelayModel:
             axis = 1
         )
 
+        if not isinstance(self.features, pd.DataFrame):
+            self.features = pd.DataFrame(columns=features.columns)
+
         threshold_in_minutes = 15
         data['delay'] = (data['min_diff'] > threshold_in_minutes).astype(int)
-        # print(data)
-        if isinstance(self.features, pd.DataFrame):
-            if len(self.features.columns) == 37:
-                print("self.features If it exists, there's no need to populate.")
-            else:
-                print("self.features It doesn't exist and needs to be populated.")
-                self.features = pd.DataFrame(columns=features.columns)
-        else:
-            print("self.features It doesn't exist and needs to be populated.")
-            self.features = pd.DataFrame(columns=features.columns)
-        print(self.features)
+
+        if (len(features.columns) == 3):
+            for col in features.columns:
+                self.features[col] = self.features[col].add(features[col], fill_value=0).fillna(0)
+            features = self.features.fillna(0)
+
+        features = features[self.top_10_features]
+
         if target_column:
-            target = data[target_column]
+            target = data[[target_column]]
             return features, target
         else:
             return features
 
-    def fit(self, features: pd.DataFrame, target: pd.Series) -> None:
-        self._model.fit(features, target)
+    def fit(self, features: pd.DataFrame, target: pd.DataFrame, col_target: str) -> None:
+        self._model.fit(features, target[col_target])
 
     def predict(self, features: pd.DataFrame) -> Union[str, Any]:
-        for col in features.columns:
-            self.features[col] = self.features[col].add(features[col], fill_value=0).fillna(0)
-        df_new = self.features.fillna(0)
-        print(df_new)
-        predictions = self._model.predict(df_new)
+        predictions = self._model.predict(features)
         return predictions.tolist()
