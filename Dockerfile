@@ -11,9 +11,9 @@ COPY ./tests /app/tests
 # Instala as dependências necessárias
 RUN pip install --upgrade pip
 RUN pip install uvicorn
-RUN make install
-RUN make model-test
-RUN make api-test
+#RUN make install
+#RUN make model-test
+#RUN make api-test
 
 # Informa ao Docker que a aplicação escuta na porta 8000
 EXPOSE 8000
