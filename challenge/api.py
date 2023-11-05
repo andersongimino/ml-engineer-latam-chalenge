@@ -3,7 +3,7 @@ import fastapi
 from fastapi import UploadFile, File
 from pydantic import BaseModel
 from typing import List
-from model import DelayModel  # Import the DelayModel from model.py
+from challenge.model import DelayModel  # Import the DelayModel from model.py
 import pandas as pd
 
 app = fastapi.FastAPI()
