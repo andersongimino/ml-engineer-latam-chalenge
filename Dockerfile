@@ -9,6 +9,7 @@ COPY ./data /app/data
 COPY ./tests /app/tests
 
 # Instala as dependências necessárias
+RUN pip install --upgrade pip
 RUN pip install uvicorn
 RUN make install
 RUN make model-test
