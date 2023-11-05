@@ -2,13 +2,15 @@ version: '3.8'
 
 services:
   challenge-latam:
-    image: challenge-latam:latest  # Nome da imagem a ser usada
-    build: .  # Diretório contendo o Dockerfile, se você estiver construindo a imagem localmente
+    image: challenge-latam:latest
+    build: .
     ports:
       - "5000:5000"
   web:
     container_name: web
     image: nginx
+    ports:
+      - "80:80"
     volumes:
       - ./config/nginx/conf/:/etc/nginx/conf.d
       - ./config/nginx/logs/:/var/log/nginx

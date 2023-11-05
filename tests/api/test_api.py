@@ -19,10 +19,10 @@ class TestBatchPipeline(unittest.TestCase):
             ]
         }
         # when("xgboost.XGBClassifier").predict(ANY).thenReturn(np.array([0])) # change this line to the model of chosing
-        # Caminho para o arquivo CSV real no repositório
+        # Path to the actual CSV file in the repository.
         file_path = '/mnt/c/Users/Datum TI/dev/ml-engineer-latam-chalenge/data/data.csv'
 
-        # Fazer a requisição de teste abrindo o arquivo real
+        # Make a request to the train method to enable the predict method.
         with open(file_path, 'rb') as f:
             response_train = self.client.post("/train", files={'file': ('data.csv', f, 'text/csv')})
             self.assertEqual(response_train.status_code, 200)
