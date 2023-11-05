@@ -2,37 +2,23 @@
 import fastapi
 from fastapi import UploadFile, File
 from pydantic import BaseModel
-from typing import List
-import uvicorn
+from typing import List, Optional
 from model import DelayModel  # Import the DelayModel from model.py
 import pandas as pd
 
 app = fastapi.FastAPI()
 # Initialize the model
 model = DelayModel()
-#save feature based on dataset trained
-
 
 # Define a Pydantic model for the request body of the prediction endpoint
-class FlightData(BaseModel):
-    Fecha_I: str
-    Vlo_I: str
-    Ori_I: str
-    Des_I: str
-    Emp_I: str
-    Fecha_O: str
-    Vlo_O: str
-    Ori_O: str
-    Des_O: str
-    Emp_O: str
-    DIA: str
-    MES: str
-    AÑO: str
-    DIANOM: str
-    TIPOVUELO: str
+class Flight(BaseModel):
     OPERA: str
-    SIGLAORI: str
-    SIGLADES: str
+    TIPOVUELO: str
+    MES: str
+
+
+class FlightsData(BaseModel):
+    flights: List[Flight]
 
 
 @app.get("/health", status_code=200)
@@ -59,11 +45,11 @@ async def train_model(file: UploadFile = File(...)) -> dict:
 
 
 @app.post("/predict", status_code=200)
-async def post_predict(flight_data: List[FlightData]) -> dict:
+async def post_predict(flights_data: FlightsData) -> dict:
     try:
-        # Convert the flight data to a pandas DataFrame
-        data = pd.DataFrame([item.dict() for item in flight_data])
-        # Preprocess the data
+        # Converter a lista de dados de voo em um DataFrame pandas
+        data = pd.DataFrame([flight.dict() for flight in flights_data.flights])
+        # Preprocessar os dados
         features, target = model.preprocess(data, 'delay')
         # Get predictions
         predictions = model.predict(features)
