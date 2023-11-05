@@ -1,0 +1,8 @@
+version: '3.8'
+
+services:
+  challenge-latam:
+    image: challenge-latam:latest  # Nome da imagem a ser usada
+    build: .  # Diretório contendo o Dockerfile, se você estiver construindo a imagem localmente
+    ports:
+      - "5000:5000"

@@ -15,6 +15,16 @@ class DelayModel:
             "DIA", "MES", "AÑO", "DIANOM", "TIPOVUELO",
             "OPERA", "SIGLAORI", "SIGLADES"
         ]
+        self.all_features = ['OPERA_Aerolineas Argentinas', 'OPERA_Aeromexico', 'OPERA_Air Canada',
+                             'OPERA_Air France', 'OPERA_Alitalia', 'OPERA_American Airlines',
+                             'OPERA_Austral', 'OPERA_Avianca', 'OPERA_British Airways',
+                             'OPERA_Copa Air', 'OPERA_Delta Air', 'OPERA_Gol Trans',
+                             'OPERA_Grupo LATAM', 'OPERA_Iberia', 'OPERA_JetSmart SPA',
+                             'OPERA_K.L.M.', 'OPERA_Lacsa', 'OPERA_Latin American Wings',
+                             'OPERA_Oceanair Linhas Aereas', 'OPERA_Plus Ultra Lineas Aereas',
+                             'OPERA_Qantas Airways', 'OPERA_Sky Airline', 'OPERA_United Airlines',
+                             'TIPOVUELO_I', 'TIPOVUELO_N', 'MES_1', 'MES_10', 'MES_11', 'MES_12',
+                             'MES_2', 'MES_3', 'MES_4', 'MES_5', 'MES_6', 'MES_7', 'MES_8', 'MES_9']
         self.top_10_features = [
             "OPERA_Latin American Wings",
             "MES_7",
@@ -93,8 +103,10 @@ class DelayModel:
 
         threshold_in_minutes = 15
         data['delay'] = (data['min_diff'] > threshold_in_minutes).astype(int)
-
+        print(features.columns)
         if (len(features.columns) == 3):
+            if self.features.empty:
+                self.features = pd.DataFrame(columns=self.all_features)
             for col in features.columns:
                 self.features[col] = self.features[col].add(features[col], fill_value=0).fillna(0)
             features = self.features.fillna(0)
