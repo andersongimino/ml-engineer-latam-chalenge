@@ -6,3 +6,10 @@ services:
     build: .  # Diretório contendo o Dockerfile, se você estiver construindo a imagem localmente
     ports:
       - "5000:5000"
+  web:
+    container_name: web
+    image: nginx
+    volumes:
+      - ./config/nginx/conf/:/etc/nginx/conf.d
+      - ./config/nginx/logs/:/var/log/nginx
+      - ./config/nginx/html/:/var/www/html
