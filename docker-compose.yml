@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  challenge-latam:
+    image: challenge-latam:latest
+    build: .
+    ports:
+      - "8000:8000"
+  web:
+    container_name: web
+    image: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./config/nginx/conf/:/etc/nginx/conf.d
+      - ./config/nginx/logs/:/var/log/nginx
+      - ./config/nginx/html/:/var/www/html
