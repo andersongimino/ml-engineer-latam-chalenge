@@ -1,12 +1,12 @@
 import unittest
 
 from fastapi.testclient import TestClient
-from challenge import application
+from challenge.api import app
 
 
 class TestBatchPipeline(unittest.TestCase):
     def setUp(self):
-        self.client = TestClient(application)
+        self.client = TestClient(app)
 
     def test_should_get_predict(self):
         data = {
